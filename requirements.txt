@@ -1,0 +1,37 @@
+# ===========================================
+# Multilingual RAG System - Dependencies
+# ===========================================
+
+# Core Framework
+streamlit>=1.28.0
+
+# LLM Providers
+cohere>=5.0.0
+
+# Document Parsing
+llama-parse>=0.4.0
+llama-index-core>=0.10.0
+
+# Vector Database
+qdrant-client>=1.7.0
+
+# Embeddings (Sparse)
+fastembed>=0.2.0
+
+# Language Detection
+langdetect>=1.0.9
+
+# Configuration
+pydantic>=2.0.0
+pydantic-settings>=2.0.0
+python-dotenv>=1.0.0
+
+# Text Processing
+tiktoken>=0.5.0
+
+# Utilities
+uuid>=1.30
+tenacity>=8.2.0
+
+# Logging
+loguru>=0.7.0
