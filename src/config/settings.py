@@ -31,7 +31,11 @@ class Settings(BaseSettings):
         ...,
         description="LlamaCloud API key for LlamaParse PDF parsing"
     )
-    
+    gemini_api_key: str = Field(
+        ...,
+        description="Google Gemini API key for text generation and embeddings"
+    )
+
     # -----------------
     # Qdrant Settings
     # -----------------
@@ -92,6 +96,15 @@ class Settings(BaseSettings):
         description="Cohere model for reranking"
     )
     
+    gemini_generation_model: str = Field(
+        default="gemini-2.0-flash",
+        description="Gemini model for text generation"
+    )
+
+    gemini_embed_model: str = Field(
+        default="text-embedding-004",
+        description="Gemini model for embeddings"
+    )
     # -----------------
     # App Settings
     # -----------------

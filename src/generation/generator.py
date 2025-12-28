@@ -32,7 +32,7 @@ class ResponseGenerator:
     
     def __init__(self):
         """Initialize the generator."""
-        self.provider = get_provider("cohere")
+        self.provider = get_provider("gemini")
         self.citation_formatter = CitationFormatter()
         
         #logger.info("ResponseGenerator initialized")
@@ -74,7 +74,7 @@ class ResponseGenerator:
         
         # Step 3: Generate answer
         # try:
-        answer = self.provider.generate(
+        answer = self.provider.generate_text(
             prompt=query,
             context=system_prompt,
             chat_history=chat_history

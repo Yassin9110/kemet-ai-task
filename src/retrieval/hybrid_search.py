@@ -185,4 +185,6 @@ class HybridSearcher:
             top_k=search_limit
         )
         
+        print(f"Hybrid search returned {len(combined)} results")
+        print("\n\n", combined, "\n\n")
         return combined
