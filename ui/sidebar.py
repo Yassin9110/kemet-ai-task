@@ -86,34 +86,34 @@ def _ingest_document(uploaded_file):
     """Ingest a document into the RAG system."""
     
     with show_spinner("Processing document... This may take a moment."):
-        try:
-            # Get RAG orchestrator
-            rag = get_rag()
+        # try:
+        # Get RAG orchestrator
+        rag = get_rag()
+        
+        # Read file bytes
+        file_bytes = uploaded_file.getvalue()
+        
+        # Ingest document
+        result = rag.ingest_document(uploaded_file.name, file_bytes)
+        
+        if result.success:
+            # Track document
+            add_document(
+                doc_name=result.document_name,
+                num_chunks=result.total_chunks,
+                language=result.language
+            )
             
-            # Read file bytes
-            file_bytes = uploaded_file.getvalue()
-            
-            # Ingest document
-            result = rag.ingest_document(uploaded_file.name, file_bytes)
-            
-            if result.success:
-                # Track document
-                add_document(
-                    doc_name=result.document_name,
-                    num_chunks=result.total_chunks,
-                    language=result.language
-                )
+            show_success(
+                f"Document processed! "
+                f"Created {result.total_chunks} chunks "
+                f"in {result.processing_time_ms:.0f}ms"
+            )
+        else:
+            show_error(f"Failed to process: {result.error_message}")
                 
-                show_success(
-                    f"Document processed! "
-                    f"Created {result.total_chunks} chunks "
-                    f"in {result.processing_time_ms:.0f}ms"
-                )
-            else:
-                show_error(f"Failed to process: {result.error_message}")
-                
-        except Exception as e:
-            show_error(f"Error: {str(e)}")
+        # except Exception as e:
+        #     show_error(f"Error: {str(e)}")
 
 
 def _render_document_list():

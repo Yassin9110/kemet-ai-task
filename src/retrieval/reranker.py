@@ -5,10 +5,10 @@ Takes initial results and reorders them by relevance.
 """
 
 from src.config import settings
-from src.core.logging import get_logger
-from src.providers import get_provider
+# from src.core.logging import  get_logger
+from src.llmproviders import get_provider
 
-logger = get_logger(__name__, settings.log_level)
+#logger = get_#logger(__name__, settings.log_level)
 
 
 class Reranker:
@@ -28,7 +28,7 @@ class Reranker:
     def __init__(self):
         """Initialize reranker with Cohere provider."""
         self.provider = get_provider("cohere")
-        logger.info("Reranker initialized")
+        #logger.info("Reranker initialized")
     
     def rerank(
         self,
@@ -57,7 +57,7 @@ class Reranker:
         if len(results) <= top_k:
             return results
         
-        logger.info(f"Reranking {len(results)} results to top {top_k}")
+        #logger.info(f"Reranking {len(results)} results to top {top_k}")
         
         # Step 1: Extract text content for reranking
         documents = [r["payload"]["content"] for r in results]
@@ -73,6 +73,6 @@ class Reranker:
             original_result["rerank_score"] = item["score"]
             reranked.append(original_result)
         
-        logger.info(f"Reranking complete: {len(reranked)} results")
+        #logger.info(f"Reranking complete: {len(reranked)} results")
         
         return reranked

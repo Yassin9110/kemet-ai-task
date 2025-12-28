@@ -73,18 +73,18 @@ def _handle_user_input(prompt: str):
     
     # Generate response
     with show_spinner("Thinking..."):
-        try:
-            rag = get_rag()
-            chat_history = get_chat_history()
+        # try:
+        rag = get_rag()
+        chat_history = get_chat_history()
+        
+        # Query RAG system
+        result = rag.query(prompt, chat_history)
+        
+        # Add assistant message
+        add_message("assistant", result.answer)
+        show_message("assistant", result.answer)
             
-            # Query RAG system
-            result = rag.query(prompt, chat_history)
-            
-            # Add assistant message
-            add_message("assistant", result.answer)
-            show_message("assistant", result.answer)
-            
-        except Exception as e:
-            error_msg = f"Sorry, an error occurred: {str(e)}"
-            add_message("assistant", error_msg)
-            show_message("assistant", error_msg)
+        # except Exception as e:
+        #     error_msg = f"Sorry, an error occurred: {str(e)}"
+        #     add_message("assistant", error_msg)
+        #     show_message("assistant", error_msg)

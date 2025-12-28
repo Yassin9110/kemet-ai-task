@@ -5,11 +5,11 @@ Uses recursive splitting to respect natural text boundaries.
 """
 
 from src.config import settings
-from src.core.logging import get_logger
+# from src.core.logging import get_logger
 from src.core.models import DocumentChunk, DocumentMetadata, Language
 from src.core.language import LanguageDetector
 
-logger = get_logger(__name__, settings.log_level)
+#logger = # get_logger(__name__, settings.log_level)
 
 
 class TextChunker:
@@ -37,7 +37,7 @@ class TextChunker:
         self.overlap = overlap or settings.chunk_overlap
         self.language_detector = LanguageDetector()
         
-        logger.info(f"TextChunker initialized: size={self.chunk_size}, overlap={self.overlap}")
+        #logger.info(f"TextChunker initialized: size={self.chunk_size}, overlap={self.overlap}")
     
     def chunk(
         self,
@@ -89,7 +89,7 @@ class TextChunker:
             )
             chunks.append(chunk)
         
-        logger.info(f"Created {len(chunks)} chunks from text")
+        #logger.info(f"Created {len(chunks)} chunks from text")
         
         return chunks
     
@@ -127,7 +127,7 @@ class TextChunker:
         for i, chunk in enumerate(all_chunks):
             chunk.chunk_index = i
         
-        logger.info(f"Document chunked: {len(all_chunks)} total chunks from {total_pages} pages")
+        #logger.info(f"Document chunked: {len(all_chunks)} total chunks from {total_pages} pages")
         
         return all_chunks
     

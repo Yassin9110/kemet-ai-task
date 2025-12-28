@@ -4,10 +4,10 @@ Citation formatter for adding source references to answers.
 Creates inline citations like [1], [2] with source details.
 """
 
-from src.core.logging import get_logger
+# from src.core.logging import get_logger
 from src.config import settings
 
-logger = get_logger(__name__, settings.log_level)
+#logger = get_##logger(__name__, settings.log_level)
 
 
 class CitationFormatter:
@@ -56,7 +56,7 @@ class CitationFormatter:
         context = "\n\n".join(context_parts)
         sources = "Sources:\n" + "\n".join(sources_parts)
         
-        logger.debug(f"Formatted {len(results)} citations")
+        #logger.debug(f"Formatted {len(results)} citations")
         
         return context, sources
     
@@ -95,7 +95,7 @@ class CitationFormatter:
         context = "\n\n".join(context_parts)
         sources = "المصادر:\n" + "\n".join(sources_parts)
         
-        logger.debug(f"Formatted {len(results)} Arabic citations")
+        #logger.debug(f"Formatted {len(results)} Arabic citations")
         
         return context, sources
     

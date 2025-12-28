@@ -6,13 +6,13 @@ Combines context retrieval with answer generation.
 
 import time
 from src.config import settings
-from src.core.logging import get_logger
+# from src.core.logging import  get_logger
 from src.core.models import GenerationResult, RetrievedChunk, DocumentChunk, DocumentMetadata, Language
-from src.providers import get_provider
+from src.llmproviders import get_provider
 from .prompts import get_system_prompt, get_no_answer_message
 from .citations import CitationFormatter
 
-logger = get_logger(__name__, settings.log_level)
+#logger = get_#logger(__name__, settings.log_level)
 
 
 class ResponseGenerator:
@@ -35,7 +35,7 @@ class ResponseGenerator:
         self.provider = get_provider("cohere")
         self.citation_formatter = CitationFormatter()
         
-        logger.info("ResponseGenerator initialized")
+        #logger.info("ResponseGenerator initialized")
     
     def generate(
         self,
@@ -73,39 +73,39 @@ class ResponseGenerator:
         system_prompt = get_system_prompt(language, context)
         
         # Step 3: Generate answer
-        try:
-            answer = self.provider.generate(
-                prompt=query,
-                context=system_prompt,
-                chat_history=chat_history
-            )
+        # try:
+        answer = self.provider.generate(
+            prompt=query,
+            context=system_prompt,
+            chat_history=chat_history
+        )
+        
+        # Step 4: Add sources to answer
+        full_answer = self.citation_formatter.add_sources_to_answer(
+            answer=answer,
+            sources=sources,
+            language=language
+        )
+        
+        # Calculate time
+        generation_time = (time.time() - start_time) * 1000
+        
+        # Create source chunks for result
+        source_chunks = self._convert_to_retrieved_chunks(results)
+        
+        #logger.log_generation(language, len(full_answer), generation_time)
+        
+        return GenerationResult(
+            answer=full_answer,
+            sources=source_chunks,
+            language=Language(language),
+            has_answer=True,
+            generation_time_ms=generation_time
+        )
             
-            # Step 4: Add sources to answer
-            full_answer = self.citation_formatter.add_sources_to_answer(
-                answer=answer,
-                sources=sources,
-                language=language
-            )
-            
-            # Calculate time
-            generation_time = (time.time() - start_time) * 1000
-            
-            # Create source chunks for result
-            source_chunks = self._convert_to_retrieved_chunks(results)
-            
-            logger.log_generation(language, len(full_answer), generation_time)
-            
-            return GenerationResult(
-                answer=full_answer,
-                sources=source_chunks,
-                language=Language(language),
-                has_answer=True,
-                generation_time_ms=generation_time
-            )
-            
-        except Exception as e:
-            logger.error(f"Generation failed: {str(e)}")
-            return self._create_error_result(language, str(e), start_time)
+        # except Exception as e:
+        #     #logger.error(f"Generation failed: {str(e)}")
+        #     return self._create_error_result(language, str(e), start_time)
     
     def _create_no_answer_result(
         self,

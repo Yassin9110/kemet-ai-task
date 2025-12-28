@@ -1,0 +1,6 @@
+# .streamlit/config.toml
+[client]
+showErrorDetails = true
+
+[logger]
+level = "error"

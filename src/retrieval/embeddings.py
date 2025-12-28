@@ -7,10 +7,10 @@ Embedding generator for dense and sparse vectors.
 
 from fastembed import SparseTextEmbedding
 from src.config import settings
-from src.core.logging import get_logger
-from src.providers import get_provider
+# from src.core.logging import  get_logger
+from src.llmproviders import get_provider
 
-logger = get_logger(__name__, settings.log_level)
+#logger = get_#logger(__name__, settings.log_level)
 
 
 class EmbeddingGenerator:
@@ -37,7 +37,7 @@ class EmbeddingGenerator:
             model_name="Qdrant/bm25"
         )
         
-        logger.info("EmbeddingGenerator initialized")
+        #logger.info("EmbeddingGenerator initialized")
     
     def embed_dense(self, texts: list[str]) -> list[list[float]]:
         """
@@ -53,7 +53,7 @@ class EmbeddingGenerator:
             return []
         
         embeddings = self.provider.embed(texts)
-        logger.debug(f"Created {len(embeddings)} dense embeddings")
+        #logger.debug(f"Created {len(embeddings)} dense embeddings")
         
         return embeddings
     
@@ -70,7 +70,7 @@ class EmbeddingGenerator:
             Single embedding vector
         """
         embedding = self.provider.embed_query(query)
-        logger.debug("Created query dense embedding")
+        #logger.debug("Created query dense embedding")
         
         return embedding
     
@@ -98,7 +98,7 @@ class EmbeddingGenerator:
                 "values": emb.values.tolist()
             })
         
-        logger.debug(f"Created {len(sparse_vectors)} sparse embeddings")
+        #logger.debug(f"Created {len(sparse_vectors)} sparse embeddings")
         
         return sparse_vectors
     

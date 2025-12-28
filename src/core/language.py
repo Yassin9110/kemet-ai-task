@@ -33,21 +33,21 @@ class LanguageDetector:
             return Language.UNKNOWN
         
         # Step 2: Try to detect the language
-        try:
-            detected = detect(text)
-            
-            # Step 3: Map the result to our Language enum
-            if detected == "en":
-                return Language.ENGLISH
-            elif detected == "ar":
-                return Language.ARABIC
-            else:
-                # Other languages default to English for response
-                return Language.ENGLISH
+        # try:
+        detected = detect(text)
+        
+        # Step 3: Map the result to our Language enum
+        if detected == "en":
+            return Language.ENGLISH
+        elif detected == "ar":
+            return Language.ARABIC
+        else:
+            # Other languages default to English for response
+            return Language.ENGLISH
                 
-        except LangDetectException:
-            # If detection fails, return unknown
-            return Language.UNKNOWN
+        # except LangDetectException:
+        #     # If detection fails, return unknown
+        #     return Language.UNKNOWN
     
     def is_arabic(self, text: str) -> bool:
         """

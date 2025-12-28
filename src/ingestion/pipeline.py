@@ -6,13 +6,13 @@ Parse -> Chunk -> Embed -> Store
 
 import time
 from src.config import settings
-from src.core.logging import get_logger
+# from src.core.logging import  get_logger
 from src.core.models import DocumentChunk, IngestionResult, Language
 from src.core.language import LanguageDetector
 from .parser import DocumentParser
 from .chunker import TextChunker
 
-logger = get_logger(__name__, settings.log_level)
+#logger = get_#logger(__name__, settings.log_level)
 
 
 class IngestionPipeline:
@@ -30,7 +30,7 @@ class IngestionPipeline:
         self.chunker = TextChunker()
         self.language_detector = LanguageDetector()
         
-        logger.info("IngestionPipeline initialized")
+        #logger.info("IngestionPipeline initialized")
     
     def ingest(
         self,
@@ -49,65 +49,65 @@ class IngestionPipeline:
         """
         start_time = time.time()
         
-        try:
-            # Log start
-            logger.log_ingestion_start(filename, len(file_bytes))
+        # try:
+        # Log start
+        #logger.log_ingestion_start(filename, len(file_bytes))
+        
+        # Step 1: Parse the document
+        #logger.info("Step 1: Parsing document...")
+        parsed = self.parser.parse(filename, file_bytes)
+        
+        #logger.log_parsing(filename, parsed.get("pages"))
+        
+        # Step 2: Chunk the document
+        #logger.info("Step 2: Chunking document...")
+        chunks = self.chunker.chunk_document(
+            page_texts=parsed["page_texts"],
+            document_name=filename,
+            file_type=parsed["file_type"]
+        )
+        
+        # Calculate average chunk size
+        if chunks:
+            avg_size = sum(len(c.content) for c in chunks) / len(chunks)
+            #logger.log_chunking(len(chunks), avg_size)
+        
+        # Step 3: Detect primary language
+        primary_language = self._detect_primary_language(chunks)
+        
+        # Calculate processing time
+        processing_time = (time.time() - start_time) * 1000
+        
+        # Create result
+        result = IngestionResult(
+            document_name=filename,
+            total_chunks=len(chunks),
+            total_pages=parsed.get("pages"),
+            language=primary_language,
+            success=True,
+            processing_time_ms=processing_time
+        )
+        
+        #logger.log_ingestion_complete(filename, len(chunks), processing_time)
+        
+        return chunks, result
             
-            # Step 1: Parse the document
-            logger.info("Step 1: Parsing document...")
-            parsed = self.parser.parse(filename, file_bytes)
+        # except Exception as e:
+        #     processing_time = (time.time() - start_time) * 1000
             
-            logger.log_parsing(filename, parsed.get("pages"))
+        #     #logger.error(f"Ingestion failed for {filename}: {str(e)}")
             
-            # Step 2: Chunk the document
-            logger.info("Step 2: Chunking document...")
-            chunks = self.chunker.chunk_document(
-                page_texts=parsed["page_texts"],
-                document_name=filename,
-                file_type=parsed["file_type"]
-            )
+        #     result = IngestionResult(
+        #         document_name=filename,
+        #         total_chunks=0,
+        #         total_pages=None,
+        #         language=Language.UNKNOWN,
+        #         success=False,
+        #         error_message=str(e),
+        #         processing_time_ms=processing_time
+        #     )
             
-            # Calculate average chunk size
-            if chunks:
-                avg_size = sum(len(c.content) for c in chunks) / len(chunks)
-                logger.log_chunking(len(chunks), avg_size)
-            
-            # Step 3: Detect primary language
-            primary_language = self._detect_primary_language(chunks)
-            
-            # Calculate processing time
-            processing_time = (time.time() - start_time) * 1000
-            
-            # Create result
-            result = IngestionResult(
-                document_name=filename,
-                total_chunks=len(chunks),
-                total_pages=parsed.get("pages"),
-                language=primary_language,
-                success=True,
-                processing_time_ms=processing_time
-            )
-            
-            logger.log_ingestion_complete(filename, len(chunks), processing_time)
-            
-            return chunks, result
-            
-        except Exception as e:
-            processing_time = (time.time() - start_time) * 1000
-            
-            logger.error(f"Ingestion failed for {filename}: {str(e)}")
-            
-            result = IngestionResult(
-                document_name=filename,
-                total_chunks=0,
-                total_pages=None,
-                language=Language.UNKNOWN,
-                success=False,
-                error_message=str(e),
-                processing_time_ms=processing_time
-            )
-            
-            return [], result
+        #     return [], result
     
     def validate_file(self, filename: str, file_size: int) -> tuple[bool, str]:
         """

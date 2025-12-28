@@ -5,8 +5,10 @@ This is the "brain" of the system - it coordinates all components.
 """
 
 import time
+
+from qdrant_client import QdrantClient
 from src.config import settings
-from src.core.logging import get_logger
+# from src.core.logging import  get_logger
 from src.core.models import (
     DocumentChunk,
     GenerationResult,
@@ -20,7 +22,7 @@ from src.ingestion import IngestionPipeline
 from src.retrieval import EmbeddingGenerator, VectorStore, HybridSearcher, Reranker
 from src.generation import ResponseGenerator
 
-logger = get_logger(__name__, settings.log_level)
+#logger = get_#logger(__name__, settings.log_level)
 
 
 class RAGOrchestrator:
@@ -44,18 +46,19 @@ class RAGOrchestrator:
     
     def __init__(self):
         """Initialize all components."""
-        logger.info("Initializing RAG Orchestrator...")
-        
+        #logger.info("Initializing RAG Orchestrator...")
+        self.qdrant_client = QdrantClient(path=settings.qdrant_path)
         # Core components
         self.ingestion = IngestionPipeline()
         self.embedder = EmbeddingGenerator()
-        self.vector_store = VectorStore()
+        self.vector_store = VectorStore(self.qdrant_client)
         self.searcher = HybridSearcher(self.embedder, self.vector_store)
         self.reranker = Reranker()
         self.generator = ResponseGenerator()
         self.language_detector = LanguageDetector()
         
-        logger.info("RAG Orchestrator ready!")
+        
+        #logger.info("RAG Orchestrator ready!")
     
     # ==================
     # DOCUMENT INGESTION
@@ -78,13 +81,13 @@ class RAGOrchestrator:
         Returns:
             IngestionResult with status and stats
         """
-        logger.info(f"Starting ingestion: {filename}")
+        #logger.info(f"Starting ingestion: {filename}")
         start_time = time.time()
         
         # Step 1: Validate file
         is_valid, error = self.ingestion.validate_file(filename, len(file_bytes))
         if not is_valid:
-            logger.error(f"Validation failed: {error}")
+            #logger.error(f"Validation failed: {error}")
             return IngestionResult(
                 document_name=filename,
                 total_chunks=0,
@@ -101,24 +104,24 @@ class RAGOrchestrator:
             return result
         
         # Step 3: Create embeddings
-        logger.info("Creating embeddings...")
+        #logger.info("Creating embeddings...")
         texts = [chunk.content for chunk in chunks]
         
         dense_embeddings = self.embedder.embed_dense(texts)
         sparse_embeddings = self.embedder.embed_sparse(texts)
         
         embedding_time = (time.time() - start_time) * 1000
-        logger.log_embedding(len(chunks), embedding_time)
+        #logger.log_embedding(len(chunks), embedding_time)
         
         # Step 4: Store in vector database
-        logger.info("Storing in vector database...")
+        #logger.info("Storing in vector database...")
         self.vector_store.add_chunks(chunks, dense_embeddings, sparse_embeddings)
         
         # Update processing time
         total_time = (time.time() - start_time) * 1000
         result.processing_time_ms = total_time
         
-        logger.info(f"Ingestion complete: {len(chunks)} chunks in {total_time:.0f}ms")
+        #logger.info(f"Ingestion complete: {len(chunks)} chunks in {total_time:.0f}ms")
         
         return result
     
@@ -146,43 +149,43 @@ class RAGOrchestrator:
         chat_history = chat_history or []
         start_time = time.time()
         
-        logger.info(f"Processing query: {question[:50]}...")
+        #logger.info(f"Processing query: {question[:50]}...")
         
         # Step 1: Detect language
         language = self.language_detector.detect(question)
         lang_code = language.value  # "en" or "ar"
-        logger.log_language_detected(question, lang_code)
+        #logger.log_language_detected(question, lang_code)
         
         # Step 2: Check if we have any documents
         stats = self.vector_store.get_stats()
         if stats["total_chunks"] == 0:
-            logger.warning("No documents in vector store")
+            #logger.warning("No documents in vector store")
             return self._no_documents_response(lang_code, start_time)
         
         # Step 3: Search for relevant chunks
-        logger.info("Searching for relevant chunks...")
+        #logger.info("Searching for relevant chunks...")
         search_results = self.searcher.search(
             query=question,
             top_k=settings.top_k_retrieval
         )
         
         retrieval_time = (time.time() - start_time) * 1000
-        logger.log_retrieval(question, len(search_results), retrieval_time)
+        #logger.log_retrieval(question, len(search_results), retrieval_time)
         
         # Step 4: Rerank results
         if search_results:
-            logger.info("Reranking results...")
+            #logger.info("Reranking results...")
             reranked_results = self.reranker.rerank(
                 query=question,
                 results=search_results,
                 top_k=settings.rerank_top_k
             )
-            logger.log_reranking(len(search_results), len(reranked_results), 0)
+            #logger.log_reranking(len(search_results), len(reranked_results), 0)
         else:
             reranked_results = []
         
         # Step 5: Generate answer
-        logger.info("Generating answer...")
+        #logger.info("Generating answer...")
         result = self.generator.generate(
             query=question,
             results=reranked_results,
@@ -191,7 +194,7 @@ class RAGOrchestrator:
         )
         
         total_time = (time.time() - start_time) * 1000
-        logger.info(f"Query complete in {total_time:.0f}ms")
+        #logger.info(f"Query complete in {total_time:.0f}ms")
         
         return result
     
@@ -204,9 +207,9 @@ class RAGOrchestrator:
         Clear all documents from the vector store.
         Use this when starting a new session.
         """
-        logger.info("Clearing all documents...")
+        #logger.info("Clearing all documents...")
         self.vector_store.clear()
-        logger.info("Documents cleared")
+        #logger.info("Documents cleared")
     
     def get_stats(self) -> dict:
         """

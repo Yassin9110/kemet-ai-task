@@ -8,9 +8,9 @@ Document parser for PDF and TXT files.
 from pathlib import Path
 from llama_parse import LlamaParse
 from src.config import settings
-from src.core.logging import get_logger
+# from src.core.logging import  get_logger
 
-logger = get_logger(__name__, settings.log_level)
+#logger = get_#logger(__name__, settings.log_level)
 
 
 class DocumentParser:
@@ -30,7 +30,7 @@ class DocumentParser:
             api_key=settings.llama_cloud_api_key,
             result_type="text",  # We want plain text output
         )
-        logger.info("DocumentParser initialized")
+        #logger.info("DocumentParser initialized")
     
     def parse(self, filename: str, file_bytes: bytes) -> dict:
         """
@@ -49,7 +49,7 @@ class DocumentParser:
         # Get file extension
         file_type = Path(filename).suffix.lower().strip(".")
         
-        logger.info(f"Parsing file: {filename} (type: {file_type})")
+        #logger.info(f"Parsing file: {filename} (type: {file_type})")
         
         # Route to the right parser
         if file_type == "pdf":
@@ -70,36 +70,36 @@ class DocumentParser:
         Returns:
             Dictionary with text, pages, and file_type
         """
-        try:
-            # LlamaParse expects extra_info for metadata
-            documents = self.llama_parser.load_data(
-                file_bytes,
-                extra_info={"file_name": filename}
-            )
+        # try:
+        # LlamaParse expects extra_info for metadata
+        documents = self.llama_parser.load_data(
+            file_bytes,
+            extra_info={"file_name": filename}
+        )
+        
+        # Combine all pages into one text
+        # Each document in the list is typically one page
+        all_text = ""
+        page_texts = []
+        
+        for doc in documents:
+            page_texts.append(doc.text)
+            all_text += doc.text + "\n\n"
+        
+        num_pages = len(documents)
+        
+        #logger.info(f"PDF parsed: {num_pages} pages extracted")
+        
+        return {
+            "text": all_text.strip(),
+            "pages": num_pages,
+            "page_texts": page_texts,  # Individual page content
+            "file_type": "pdf"
+        }
             
-            # Combine all pages into one text
-            # Each document in the list is typically one page
-            all_text = ""
-            page_texts = []
-            
-            for doc in documents:
-                page_texts.append(doc.text)
-                all_text += doc.text + "\n\n"
-            
-            num_pages = len(documents)
-            
-            logger.info(f"PDF parsed: {num_pages} pages extracted")
-            
-            return {
-                "text": all_text.strip(),
-                "pages": num_pages,
-                "page_texts": page_texts,  # Individual page content
-                "file_type": "pdf"
-            }
-            
-        except Exception as e:
-            logger.error(f"PDF parsing failed: {str(e)}")
-            raise
+        # except Exception as e:
+        #     #logger.error(f"PDF parsing failed: {str(e)}")
+        #     raise
     
     def _parse_txt(self, filename: str, file_bytes: bytes) -> dict:
         """
@@ -112,22 +112,22 @@ class DocumentParser:
         Returns:
             Dictionary with text, pages (None), and file_type
         """
-        try:
-            # Try UTF-8 first, then fallback to other encodings
-            text = self._decode_text(file_bytes)
+        # try:
+        # Try UTF-8 first, then fallback to other encodings
+        text = self._decode_text(file_bytes)
+        
+        #logger.info(f"TXT parsed: {len(text)} characters")
+        
+        return {
+            "text": text,
+            "pages": None,  # TXT files don't have pages
+            "page_texts": [text],  # Treat whole file as one "page"
+            "file_type": "txt"
+        }
             
-            logger.info(f"TXT parsed: {len(text)} characters")
-            
-            return {
-                "text": text,
-                "pages": None,  # TXT files don't have pages
-                "page_texts": [text],  # Treat whole file as one "page"
-                "file_type": "txt"
-            }
-            
-        except Exception as e:
-            logger.error(f"TXT parsing failed: {str(e)}")
-            raise
+        # except Exception as e:
+        #     #logger.error(f"TXT parsing failed: {str(e)}")
+        #     raise
     
     def _decode_text(self, file_bytes: bytes) -> str:
         """
@@ -143,10 +143,10 @@ class DocumentParser:
         encodings = ["utf-8", "utf-16", "cp1256", "iso-8859-6"]
         
         for encoding in encodings:
-            try:
-                return file_bytes.decode(encoding)
-            except UnicodeDecodeError:
-                continue
+            # try:
+            return file_bytes.decode(encoding)
+            # except UnicodeDecodeError:
+            #     continue
         
         # Last resort: decode with replacement characters
         return file_bytes.decode("utf-8", errors="replace")
